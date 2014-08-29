@@ -1,3 +1,5 @@
+// Pure C String and Parsing Utilities, Paul D. Senzee (c) 2000-2011
+
 #include "strs_c.h"
 
 #include <stdlib.h>
@@ -27,20 +29,20 @@ int memicmp(const void *s1, const void *s2, size_t n)
 
 static void *malloc_and_clear(size_t size, _bool clear)
 {
-	void *data = malloc(size);
-	if (clear)
+    void *data = malloc(size);
+    if (clear)
         memset(data, 0, size);
-	return data;
+    return data;
 }
 
 static char *new_chars(size_t count, _bool clear)
 {
-	return malloc_and_clear(count, clear);
+    return malloc_and_clear(count, clear);
 }
 
 static char **new_char_ptrs(size_t count, _bool clear)
 {
-	return (char **)malloc_and_clear(count * sizeof(char *), clear);
+    return (char **)malloc_and_clear(count * sizeof(char *), clear);
 }
 
 char *strs_strdup(const char *s)

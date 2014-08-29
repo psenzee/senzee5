@@ -1,4 +1,4 @@
-// Pure C String and Parsing Utilities, Paul Senzee (c) 2000-2011
+// Pure C String and Parsing Utilities, Paul D. Senzee (c) 2000-2011
 
 #ifndef _STRS_C_H
 #define _STRS_C_H
