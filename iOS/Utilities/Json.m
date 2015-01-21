@@ -1,56 +1,47 @@
-// Objective-C JSON Utilities, Paul D. Senzee (c) 2011-2014
+//
+//  Json.h
+//
+//
 
 #import "Json.h"
 #import <Foundation/Foundation.h>
 #import "strs_c.h"
 
-BOOL DeserializeJsonString(const char **json, NSObject **idout, BOOL allowNull);
-BOOL DeserializeJsonPrimitive(const char **json, NSObject **idout);
-BOOL DeserializeJsonValue(const char **json, NSObject **idout);
-BOOL DeserializeJsonPrimitive(const char **json, NSObject **idout);
-BOOL DeserializeJsonDictionary(const char **json, NSObject **idout);
-BOOL DeserializeJsonArray(const char **json, NSObject **idout);
+BOOL ParseJSONString(const char **json, NSObject **idout, BOOL allowNull);
+BOOL ParseJSONPrimitive(const char **json, NSObject **idout);
+BOOL ParseJSONValue(const char **json, NSObject **idout);
+BOOL ParseJSONPrimitive(const char **json, NSObject **idout);
+BOOL ParseJSONDictionary(const char **json, NSObject **idout);
+BOOL ParseJSONArray(const char **json, NSObject **idout);
 
-BOOL DeserializeJsonString(const char **json, NSObject **idout, BOOL allowNull)
+BOOL ParseJSONString(const char **json, NSObject **idout, BOOL allowNull)
 {
-    const char *origin = *json;
-    char *str = NULL;
-    
-    size_t strsize = strlen(origin);
-    if (strsize == 0)
+    if (!*json || !**json)
         return NO;
-    str = (char *)malloc(strsize + 1);
-    memset(str, 0, strsize + 1);
-    
+    const char *origin = *json;
+    char *qvalue = strs_tmp_buffer(strlen(origin));
     *idout = nil;
-    if (strs_read_quoted(json, '"', str, _true))
-    {
-        *idout = [NSString stringWithUTF8String:str];
-        free(str);
-    }
-    else if (allowNull && strs_is(json, "null", _false))
-    {
+    BOOL result = YES;
+    if (strs_read_quoted(json, '"', qvalue, true))
+        *idout = [NSString stringWithUTF8String:qvalue];
+    else if (allowNull && strs_is(json, "null", false))
         *idout = nil;
-        free(str);
-        return YES;
-    }
-    if (*idout == nil)
+    else if (*idout == nil)
     {
         *json = origin;
-        free(str);
-        return NO;
+        result = NO;
     }
-    free(str);
-    return YES;
+    strs_free_tmp_buffer(qvalue);
+    return result;
 }
 
-BOOL DeserializeJsonPrimitive(const char **json, NSObject **idout)
+BOOL ParseJSONPrimitive(const char **json, NSObject **idout)
 {
     const char *origin = *json;
-    float fvalue = 0.f;
+    double dvalue = 0.f;
     *idout = nil;
-    if (strs_read_float(json, &fvalue))
-        *idout = [NSNumber numberWithFloat:fvalue];
+    if (strs_read_double(json, &dvalue))
+        *idout = [NSNumber numberWithDouble:dvalue];
     else if (strs_is(json, "false", _false))
         *idout = [NSNumber numberWithInt:0];
     else if (strs_is(json, "true", _false))
@@ -68,7 +59,7 @@ BOOL DeserializeJsonPrimitive(const char **json, NSObject **idout)
     return YES;
 }
 
-BOOL DeserializeJsonDictionary(const char **json, NSObject **idout)
+BOOL ParseJSONDictionary(const char **json, NSObject **idout)
 {
     const char *origin = *json; 
     *idout = nil;
@@ -82,7 +73,7 @@ BOOL DeserializeJsonDictionary(const char **json, NSObject **idout)
     {
         
         NSObject *key = nil;
-        if (!DeserializeJsonValue(json, &key))
+        if (!ParseJSONValue(json, &key))
         {
             if (strs_is(json, "}", _false))
             {
@@ -94,7 +85,7 @@ BOOL DeserializeJsonDictionary(const char **json, NSObject **idout)
         if (!strs_is(json, ":", _false))
             break;
         NSObject *value = nil;
-        if (!DeserializeJsonValue(json, &value))
+        if (!ParseJSONValue(json, &value))
             break;
         if (value == nil)
             value = @"/nil/";
@@ -113,7 +104,7 @@ BOOL DeserializeJsonDictionary(const char **json, NSObject **idout)
     return NO;
 }
 
-BOOL DeserializeJsonArray(const char **json, NSObject **idout)
+BOOL ParseJSONArray(const char **json, NSObject **idout)
 {   
     const char *origin = *json; 
     *idout = nil;
@@ -126,7 +117,7 @@ BOOL DeserializeJsonArray(const char **json, NSObject **idout)
     while (**json)
     {
         NSObject *value = nil;
-        if (!DeserializeJsonValue(json, &value))
+        if (!ParseJSONValue(json, &value))
         {
             if (strs_is(json, "]", _false))
             {
@@ -149,23 +140,76 @@ BOOL DeserializeJsonArray(const char **json, NSObject **idout)
     return NO;
 }
 
-// Top down parse - attempt to parse JSON Values starting with primitives
-// and graduating to composite values, such as arrays and dictionaries,
-// which will recursively call this function for nested values
-BOOL DeserializeJsonValue(const char **json, NSObject **idout)
+BOOL ParseJSONValue(const char **json, NSObject **idout)
 {
-    return DeserializeJsonString(json, idout, _true) ||
-           DeserializeJsonPrimitive(json, idout) ||
-           DeserializeJsonArray(json, idout) ||
-           DeserializeJsonDictionary(json, idout); 
+    return ParseJSONString(json, idout, _true) ||
+           ParseJSONPrimitive(json, idout) ||
+           ParseJSONArray(json, idout) ||
+           ParseJSONDictionary(json, idout);
 }
 
-// Read JSON text and produce a deserialized version 
-// composed of NSNumber, NSString, NSArray and NSDictionary objects
-NSObject *DeserializeJson(NSString *json)
+NSObject *ParseJSON(NSString *json)
 {
     const char *utf8 = [json UTF8String];
     NSObject *value = nil;
-    DeserializeJsonValue(&utf8, &value);
+    ParseJSONValue(&utf8, &value);
     return value;
+}
+
+id JSONValue(id value)
+{
+    return value ? value : @"/nil/";
+}
+
+void SerializeJSON(NSMutableString *str, id value)
+{
+    if (value == nil || [value isEqual:@"/nil/"])
+    {
+        [str appendString:@"null"];
+    }
+    else if ([value isKindOfClass:[NSArray class]])
+    {
+        [str appendString:@"["];
+        BOOL first = YES;
+        for (id obj in (NSArray *)value)
+        {
+            if (!first)
+                [str appendString:@","];
+            first = NO;
+            SerializeJSON(str, obj);
+        }
+        [str appendString:@"]"];
+    }
+    else if ([value isKindOfClass:[NSDictionary class]])
+    {
+        [str appendString:@"{"];
+        BOOL first = YES;
+        NSDictionary *dict = (NSDictionary *)value;
+        for (NSString *key in [dict allKeys])
+        {
+            if (!first)
+                [str appendString:@","];
+            first = NO;
+            id kvalue = [dict objectForKey:key];
+            [str appendFormat:@"\"%@\":", key];
+            SerializeJSON(str, kvalue);
+        }
+        [str appendString:@"}"];
+    }
+    else if ([value isKindOfClass:[NSString class]])
+    {
+        [str appendFormat:@"\"%@\"", (NSString *)value];
+    }
+    else if ([value isKindOfClass:[NSNumber class]])
+    {
+        NSNumber *n = (NSNumber *)value;
+        if (n.objCType[0] == 'c') // if it comes from a char-size, assume it's a bool
+            [str appendFormat:@"%@", n.boolValue ? @"true" : @"false"];
+        else
+            [str appendFormat:@"%@", (NSNumber *)value];
+    }
+    else
+    {
+        [str appendFormat:@"\"%@\"", value];
+    }
 }

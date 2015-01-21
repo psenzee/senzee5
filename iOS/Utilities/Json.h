@@ -1,5 +1,12 @@
-// Objective-C JSON Utilities, Paul D. Senzee (c) 2011-2014
+//
+//  Json.h
+//
+//  Dead simple utilities for parsing JSON text.
+// 
 
-// Read JSON text and produce a deserialized version 
-// composed of NSNumber, NSString, NSArray and NSDictionary objects
-NSObject *DeserializeJson(NSString *json);
+#import <Foundation/Foundation.h>
+
+NSObject *ParseJSON(NSString *json);
+
+id        JSONValue(id value);
+void      SerializeJSON(NSMutableString *str, id value);
