@@ -1,0 +1,1 @@
+#ifndef _SIZE_H#define _SIZE_H    namespace core{class Size{public:        int width, height;    inline Size(int w = 0, int h = 0) : width(w), height(h) {}};    }    #endif // _SIZE_H

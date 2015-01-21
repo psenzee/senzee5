@@ -1,0 +1,1 @@
+#ifndef _PARSE_H#define _PARSE_Hbool  GetBool(const char *s, bool defaultValue);bool  GetRequiredBool(const char *s, const char *name);float GetFloat(const char *s, float defaultValue);float GetRequiredFloat(const char *s, const char *name);int   GetInt(const char *s, int defaultValue);int   GetRequiredInt(const char *s, const char *name);#endif // _PARSE_H
