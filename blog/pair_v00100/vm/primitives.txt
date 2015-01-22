@@ -1,0 +1,91 @@
+if
+while
+let
+procedure
+quote
+foreach
+function
+fn
+apply
+args
+
+first
+rest
+pair
+eq
+eql
+equal
+continuation
+resume
+
++
+-
+*
+/
+>
+>=
+<
+<=
+==
+
+add-int
+sub-int
+mul-int
+div-int
+less-than-int
+less-than-eq-int
+greater-than-int
+greater-than-eq-int
+eq-int
+
+add-long
+sub-long
+mul-long
+div-long
+less-than-long
+less-than-eq-long
+greater-than-long
+greater-than-eq-long
+eq-long
+
+add-double
+sub-double
+mul-double
+div-double
+less-than-double
+less-than-eq-double
+greater-than-double
+greater-than-eq-double
+eq-double
+
+transform                     ; not currently implemented
+evaluate-predicate            ; not currently implemented
+closure-execute               ; not currently implemented
+factory-create                ; not currently implemented
+
+to-string                     ; not currently implemented
+to-boolean                    ; not currently implemented
+to-byte                       ; not currently implemented
+to-character                  ; not currently implemented
+to-short                      ; not currently implemented
+to-int                        ; not currently implemented
+to-long                       ; not currently implemented
+to-float                      ; not currently implemented
+to-double                     ; not currently implemented
+
+append
+copy
+copy-tree
+
+iterator
+
+list
+
+put-env                       ; not currently implemented
+get-env                       ; not currently implemented
+
+call
+
+_invoke
+_evaluate_invoke
+_trace

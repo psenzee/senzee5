@@ -1,0 +1,279 @@
+* [pair] fast non-virtual primitives pair vm (tag each object (1st word or vtable ptr) and suck up the space? pointer tagging? or typeing by pointer range? + virtual for objects) (if everything is at least 64 bits, that gives me three bits for pointer tagging!, 32 gives me only 2 but is faster and smaller)
+
+primitives p32 i64 ui64 i32 ui32 i16 ui16 i8 ui8 pair32 pair64
+           tags : tags & 1 == 1 are tags, == 0 are vtable ptr(s) for objects
+           arrays are objects
+           
+// tags must be odd..
+// scheme  bit 0      (lsb)   1 (identifies a tag)
+//         bit 1..3           0 = PTR (only 32 bits + tag), 1 = INT, 2 = UINT, 3 = FLOAT, 4 = PAIR (only 32x2 bits + tag)
+//         bit 4..6           0 = 8BIT, 1 = 16BIT, 2 = 32BIT, 3 = 64BIT
+//         bit 7      (pairs) 0 = PTR_0, 1 = NON_PTR_0 (type is specified by following eight bits (w/o the lsb 1))
+//         bit 8      (pairs) 0 = PTR_1, 1 = NON_PTR_1 (type is specified by second group of following eight bits (w/o the lsb 1))
+//         bit 9..16  (pairs) TYPE_OF_NON_PTR_0 (shifted, using the above scheme w/o the lsb 1. CANNOT BE PAIR OR ANYTHING GREATER THAN 32 BITS.)
+//         bit 17..24 (pairs) TYPE_OF_NON_PTR_1 (shifted, using the above scheme w/o the lsb 1. CANNOT BE PAIR OR ANYTHING GREATER THAN 32 BITS.)
+
+typedef unsigned int TagType;
+
+class TypeInfo
+{
+public:
+    enum Type { PTR = 0, INT, UINT, FLOAT, PAIR };
+    enum Size { BITPTR = 0, BIT8 = 0, BIT16 = 1, BIT32 = 2, BIT64 = 3 };
+
+    Type type;
+    Size size;
+};
+
+class TagInfo
+{
+public:
+    bool     tagged;
+    TypeInfo type,
+             pair[2];
+};
+
+inline void tag(TagType &tag, const TagInfo &ti)
+{
+    if (ti.tagged)
+    {
+        const TypeInfo &type = ti.type;
+        tag = (type.size << 4) | (type.type << 1) | 1;
+        if (type.type == TypeInfo::PAIR)
+        {
+            const TypeInfo &pair0 = ti.pair[0],
+                           &pair1 = ti.pair[1];
+            if (pair0.type != TypeInfo::PTR)
+                tag |= (1 << 7) | (((pair0.size << 3) | pair0.type) << 9);
+            if (pair1.type != TypeInfo::PTR)
+                tag |= (1 << 8) | (((pair1.size << 3) | pair1.type) << 17);
+        }
+    }
+}
+
+inline void untag(TagType tag, TagInfo &ti)
+{
+    if (ti.tagged = ((tag & 1) != 0))
+    {
+        TypeInfo &type = ti.type;
+        type.type = (Type)((tag >>= 1) & 7);
+        type.size = (Size)((tag >>= 3) & 7);
+        if (type.type == TypeInfo::PAIR)
+        {
+           TypeInfo &pair0 = ti.pair[0],
+                    &pair1 = ti.pair[1];
+           pair0 = { TypeInfo::PTR, 0 };
+           pair1 = { TypeInfo::PTR, 0 };
+           TagType is_0_non_ptr = ((tag >>= 3) & 1),
+                   is_1_non_ptr = ((tag >>= 1) & 1);
+           tag >>= 8;
+           if (is_0_non_ptr)
+           {
+               pair0.type = (Type)(tag & 7);
+               pair0.size = (Size)((tag >>= 3) & 7);
+           }
+           if (is_1_non_ptr)
+           {
+               pair1.type = (Type)((tag >>= 8) & 7);
+               pair1.size = (Size)((tag >>= 3) & 7);
+           }
+        }
+    }
+}
+
+void gc_mark(void *);
+void gc_unmark(void *);
+void gc_enumerate(void *, Collection &);  
+
+class Pointer
+{
+    void *m_p;
+    
+public:
+
+    inline void *pointer()                  { return (void *)((uint32_t)m_p & ~1u); }
+
+    inline void gc_mark()                   { m_p = (void *)((uint32_t)m_p | 1u); }
+    inline void gc_unmark()                 { m_p = (void *)((uint32_t)m_p & ~1u); }
+    inline bool gc_ismarked()               { return ((uint32_t)m_p & 1u) != 0; }
+    inline void gc_enumerate(Collection &c) { c.add(pointer()); }
+};
+
+class Variant32
+{
+public:
+    union
+    {
+        int32_t   integer;
+        uint32_t  uinteger;
+        Pointer   ptr;
+        float     real;
+    };
+};
+
+class Variant64
+{
+public:
+    union
+    {
+        int64_t   integer;
+        uint64_t  uinteger;
+        Pointer   ptr;
+        double    real;
+    };
+};
+
+class Pair
+{ 
+public:
+
+    TagType   tag;
+    Variant32 head,
+              tail;
+
+    inline Pair() : m_tag((TypeInfo::PAIR << 1) | 1), m_head(0), m_tail(0) {}
+    
+    inline bool isheadpointer() { return !(m_tag & (1 << 7)); }
+    inline bool istailpointer() { return !(m_tag & (1 << 8)); }
+    
+    // it might be better to remove these from here and inline them into the standalone fns..
+    
+    // garbage collection methods
+    inline void gc_mark()
+    {
+        if (isheadpointer()) { head.ptr.gc_mark(); gc_mark(head.ptr.pointer()); }
+        if (istailpointer()) { tail.ptr.gc_mark(); gc_mark(tail.ptr.pointer()); }
+    }
+    inline void gc_unmark()
+    {
+        if (isheadpointer()) { head.ptr.gc_unmark(); gc_unmark(head.ptr.pointer()); }
+        if (istailpointer()) { tail.ptr.gc_unmark(); gc_unmark(tail.ptr.pointer()); }
+    }
+    inline void gc_enumerate(Collection &c)
+    { 
+        if (isheadpointer()) { head.ptr.gc_enumerate(c); gc_enumerate(head.ptr.pointer(), c); }
+        if (istailpointer()) { tail.ptr.gc_enumerate(c); gc_enumerate(tail.ptr.pointer(), c); }
+    }    
+};
+ 
+class Tagged32
+{
+public:
+    TagType   tag;
+    Variant32 data;
+    inline Tagged32(TypeInfo::Type type) : tag((TypeInfo::BIT32 << 4) | (type << 1) | 1), data.uinteger(0) {}           
+};
+
+class Tagged64
+{
+public:
+    TagType   tag;
+    Variant64 data;
+    inline Tagged64(TypeInfo::Type type) : tag((TypeInfo::BIT64 << 4) | (type << 1) | 1), data.uinteger(0) {}
+};
+
+class Object // base class
+{
+public:  
+    virtual void gc_mark() = 0;
+    virtual void gc_markrecursive() = 0;
+    virtual void gc_unmark() = 0;
+    virtual bool gc_ismarked() = 0;
+    virtual void gc_enumerate(Collection &c) = 0;
+};
+
+void gc_mark_optimized(void *p) // these can be partially tail recursive, therefore iterative
+{
+    // ok, if it's here it must be either
+    // one of the 'primitives' or a subclass of 'Object'
+loop:
+    if (*((TagType *)p) & 1)
+    {
+        TagInfo tinfo;
+        untag(*((TagType *)p), tinfo);
+        
+        // it's tagged..
+        switch (tinfo.type)
+        {
+        case TypeInfo::PTR:
+            ((Tagged32 *)p)->data.ptr.gc_mark();
+            p = data.ptr.pointer();
+            goto loop;
+        case TypeInfo::PAIR:
+            {
+                Pair *pair = (Pair *)p;
+                // $TODO ^ mark this pointer..
+                if (pair->isheadpointer() && !pair->head.ptr.gc_ismarked())
+                {
+                    pair->head.ptr.gc_mark();
+                    gc_mark_optimized(head.ptr.pointer());
+                }
+                if (pair->istailpointer() && !pair->tail.ptr.gc_ismarked())
+                {
+                    pair->tail.ptr.gc_mark();
+                    p = ptr.pointer();
+                    goto loop
+                }
+            }
+            break;
+        }      
+    }
+    else ((Object *)p)->gc_mark();
+}
+
+void gc_mark(void *p) // these can be partially tail recursive, therefore iterative
+{
+    // ok, if it's here it must be either
+    // one of the 'primitives' or a subclass of 'Object'
+    if (*((TagType *)p) & 1)
+    {
+        TagInfo tinfo;
+        untag(*((TagType *)p), tinfo);
+        
+        // it's tagged..
+        switch (tinfo.type)
+        {
+        case TypeInfo::PTR:  ((Tagged32 *)p)->data.ptr.gc_mark(); break;
+        case TypeInfo::PAIR: ((Pair *)p)->gc_mark(); break;
+        }      
+    }
+    else ((Object *)p)->gc_mark();
+}
+
+void gc_unmark(void *p) // these can be partially tail recursive, therefore iterative
+{
+    // ok, if it's here it must be either
+    // one of the 'primitives' or a subclass of 'Object'
+    if (*((TagType *)p) & 1)
+    {
+        TagInfo tinfo;
+        untag(*((TagType *)p), tinfo);
+        
+        // it's tagged..
+        switch (tinfo.type)
+        {
+        case TypeInfo::PTR:  ((Tagged32 *)p)->data.ptr.gc_unmark(); break;
+        case TypeInfo::PAIR: ((Pair *)p)->gc_unmark(); break;
+        }      
+    }
+    else ((Object *)p)->gc_mark();
+}
+ 
+void gc_enumerate(void *p, Collection &c) // these can be partially tail recursive, therefore iterative
+{
+    // ok, if it's here it must be either
+    // one of the 'primitives' or a subclass of 'Object'
+    if (*((TagType *)p) & 1)
+    {
+        TagInfo tinfo;
+        untag(*((TagType *)p), tinfo);
+        
+        // it's tagged..
+        switch (tinfo.type)
+        {
+        case TypeInfo::PTR:  ((Tagged32 *)p)->data.ptr.gc_enumerate(c); break;
+        case TypeInfo::PAIR: ((Pair *)p)->gc_enumerate(c); break;
+        }      
+    }
+    else ((Object *)p)->gc_enumerate(c);      
+}

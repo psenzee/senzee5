@@ -1,0 +1,43 @@
+(procedure
+
+  (function this-is-my-function (a b c)
+    (println "A: " a " B: " b " C: " c))
+
+  (println "Math: " (+ 13 (+ (+ 12 (* 42 84)) (+ 91 (/ 100 5)))))
+
+  (foreach (x '(a b c d e f g))
+
+    ;(let y
+    ;  (make '((x y) (println "there's " x " and then there's " y "!"))))
+
+    (if (ask "An Important Question"
+          (concat "Do you prefer hello " x "??"))
+        (procedure
+          (println "hello!   " x)
+          ; (call y x 'n)
+          )
+        (println "goodbye! " x)))
+
+  (let count 0)
+
+  (foreach (x '(a b c d e f g))
+    (let count (+ count 1.0))
+    (this-is-my-function count x count))
+
+  (println count)
+
+  (start-timer)
+
+  (foreach (x (range 0 1000000))
+    )
+    
+  (println (timer))
+  
+  (ask "did you get that?")
+  
+    )
+
+
+
+
+

@@ -1,0 +1,184 @@
+; file 'testvm4.script.slst'
+; total code size 636
+
+; bytecode
+
+; constants --
+; 23 00 00 00 04 0c 00 00 00 6b 65 72 6e 65 6c 33
+; 32 2e 64 6c 6c 05 07 00 00 00 73 74 64 63 61 6c
+; 6c 05 05 00 00 00 53 6c 65 65 70 05 01 00 00 00
+; 76 05 01 00 00 00 75 06 06 00 00 00 69 6d 70 6f
+; 72 74 05 04 00 00 00 42 65 65 70 05 02 00 00 00
+; 75 75 04 0a 00 00 00 6d 73 76 63 72 74 2e 64 6c
+; 6c 05 05 00 00 00 63 64 65 63 6c 05 06 00 00 00
+; 73 79 73 74 65 6d 05 01 00 00 00 73 05 06 00 00
+; 00 5f 67 65 74 63 68 04 00 00 00 00 04 0b 00 00
+; 00 64 69 72 20 63 3a 5c 72 6f 6f 74 05 01 00 00
+; 00 61 05 01 00 00 00 62 05 01 00 00 00 63 05 01
+; 00 00 00 64 05 01 00 00 00 65 05 01 00 00 00 66
+; 05 01 00 00 00 67 07 15 00 ff ff 07 14 00 16 00
+; 07 13 00 17 00 07 12 00 18 00 07 11 00 19 00 07
+; 10 00 1a 00 07 0f 00 1b 00 06 0c 00 00 00 73 74
+; 61 6e 64 61 72 64 2d 6f 75 74 04 01 00 00 00 0a
+; 06 05 00 00 00 77 72 69 74 65 02 33 33 b3 3f 02
+; 33 33 b3 bf 04 12 00 00 00 68 6f 77 64 79 2c 20
+; 68 6f 77 64 79 20 64 6f 6f 64 79
+
+; constants (data) -- 
+; 0      [String]                      'kernel32.dll'
+; 1      [Identifier]                  'stdcall'
+; 2      [Identifier]                  'Sleep'
+; 3      [Identifier]                  'v'
+; 4      [Identifier]                  'u'
+; 5      [ConstFunction]               'import'
+; 6      [Identifier]                  'Beep'
+; 7      [Identifier]                  'uu'
+; 8      [String]                      'msvcrt.dll'
+; 9      [Identifier]                  'cdecl'
+; 10     [Identifier]                  'system'
+; 11     [Identifier]                  's'
+; 12     [Identifier]                  '_getch'
+; 13     [String]                      ''
+; 14     [String]                      'dir c:\root'
+; 15     [Identifier]                  'a'
+; 16     [Identifier]                  'b'
+; 17     [Identifier]                  'c'
+; 18     [Identifier]                  'd'
+; 19     [Identifier]                  'e'
+; 20     [Identifier]                  'f'
+; 21     [Identifier]                  'g'
+; 22     [Pair]                        '(g)'
+; 23     [Pair]                        '(f g)'
+; 24     [Pair]                        '(e f g)'
+; 25     [Pair]                        '(d e f g)'
+; 26     [Pair]                        '(c d e f g)'
+; 27     [Pair]                        '(b c d e f g)'
+; 28     [Pair]                        '(a b c d e f g)'
+; 29     [ConstFunction]               'standard-out'
+; 30     [String]                      '\n'
+; 31     [ConstFunction]               'write'
+; 32     [PrimitiveT<float>]           '1.4'
+; 33     [PrimitiveT<float>]           '-1.4'
+; 34     [String]                      'howdy, howdy doody'
+
+; code
+
+; function 'MAIN' id=-1 localsize=64 stacksize=10
+; 05 04 00 00 00 05 03 00 00 00 05 02 00 00 00 05
+; 01 00 00 00 05 00 00 00 00 66 05 00 00 00 09 05
+; 6a 00 05 07 00 00 00 05 04 00 00 00 05 06 00 00
+; 00 05 01 00 00 00 05 00 00 00 00 66 05 00 00 00
+; 09 05 6a 01 05 0b 00 00 00 05 04 00 00 00 05 0a
+; 00 00 00 05 09 00 00 00 05 08 00 00 00 66 05 00
+; 00 00 09 05 6a 02 05 0d 00 00 00 05 04 00 00 00
+; 05 0c 00 00 00 05 09 00 00 00 05 08 00 00 00 66
+; 05 00 00 00 09 05 6a 03 05 0e 00 00 00 68 02 09
+; 01 05 1c 00 00 00 6a 04 68 04 51 6a 04 68 04 4d
+; 07 10 00 68 04 4e 6a 05 1c f4 01 68 00 09 01 0c
+; 08 ea ff 05 1e 00 00 00 68 00 66 1d 00 00 00 09
+; 00 66 1f 00 00 00 09 03 05 1e 00 00 00 68 01 66
+; 1d 00 00 00 09 00 66 1f 00 00 00 09 03 05 20 00
+; 00 00 6a 05 05 1e 00 00 00 68 05 66 1d 00 00 00
+; 09 00 66 1f 00 00 00 09 03 05 21 00 00 00 6a 05
+; 05 1e 00 00 00 68 05 66 1d 00 00 00 09 00 66 1f
+; 00 00 00 09 03 68 05 1d 00 2c 6a 05 05 1e 00 00
+; 00 68 05 66 1d 00 00 00 09 00 66 1f 00 00 00 09
+; 03 05 22 00 00 00 6a 06 68 03 09 00 0e
+
+
+;  function 'MAIN' id=-1 localsize=64 stacksize=10
+0      [ 05 04 00 00 00]              CONST  4             ; =u
+5      [ 05 03 00 00 00]              CONST  3             ; =v
+10     [ 05 02 00 00 00]              CONST  2             ; =Sleep
+15     [ 05 01 00 00 00]              CONST  1             ; =stdcall
+20     [ 05 00 00 00 00]              CONST  0             ; ="kernel32.dll"
+25     [ 66 05 00 00 00]              FUNC   5             ; =fn:import
+30     [ 09 05]                       CALL   5                    
+32     [ 6a 00]                       LET    0                    
+34     [ 05 07 00 00 00]              CONST  7             ; =uu
+39     [ 05 04 00 00 00]              CONST  4             ; =u
+44     [ 05 06 00 00 00]              CONST  6             ; =Beep
+49     [ 05 01 00 00 00]              CONST  1             ; =stdcall
+54     [ 05 00 00 00 00]              CONST  0             ; ="kernel32.dll"
+59     [ 66 05 00 00 00]              FUNC   5             ; =fn:import
+64     [ 09 05]                       CALL   5                    
+66     [ 6a 01]                       LET    1                    
+68     [ 05 0b 00 00 00]              CONST  11            ; =s
+73     [ 05 04 00 00 00]              CONST  4             ; =u
+78     [ 05 0a 00 00 00]              CONST  10            ; =system
+83     [ 05 09 00 00 00]              CONST  9             ; =cdecl
+88     [ 05 08 00 00 00]              CONST  8             ; ="msvcrt.dll"
+93     [ 66 05 00 00 00]              FUNC   5             ; =fn:import
+98     [ 09 05]                       CALL   5                    
+100    [ 6a 02]                       LET    2                    
+102    [ 05 0d 00 00 00]              CONST  13            ; =""
+107    [ 05 04 00 00 00]              CONST  4             ; =u
+112    [ 05 0c 00 00 00]              CONST  12            ; =_getch
+117    [ 05 09 00 00 00]              CONST  9             ; =cdecl
+122    [ 05 08 00 00 00]              CONST  8             ; ="msvcrt.dll"
+127    [ 66 05 00 00 00]              FUNC   5             ; =fn:import
+132    [ 09 05]                       CALL   5                    
+134    [ 6a 03]                       LET    3                    
+136    [ 05 0e 00 00 00]              CONST  14            ; ="dir c:\root"
+141    [ 68 02]                       LOCAL  2                    
+143    [ 09 01]                       CALL   1                    
+145    [ 05 1c 00 00 00]              CONST  28            ; =(a b c d e f g)
+150    [ 6a 04]                       LET    4                    
+152    [ 68 04]                       LOCAL  4                    
+154    [ 51]                          ITER   
+155    [ 6a 04]                       LET    4                    
+157    [ 68 04]                       LOCAL  4                    
+159    [ 4d]                          NEXTP  
+160    [ 07 10 00]                    JN     16            
+163    [ 68 04]                       LOCAL  4                    
+165    [ 4e]                          NEXT   
+166    [ 6a 05]                       LET    5                    
+168    [ 1c f4 01]                    INT    500           
+171    [ 68 00]                       LOCAL  0                    
+173    [ 09 01]                       CALL   1                    
+175    [ 0c]                          YIELD  
+176    [ 08 ea ff]                    JMP    -22             
+179    [ 05 1e 00 00 00]              CONST  30            ; ="\n"
+184    [ 68 00]                       LOCAL  0                    
+186    [ 66 1d 00 00 00]              FUNC   29            ; =fn:standard-out
+191    [ 09 00]                       CALL   0                    
+193    [ 66 1f 00 00 00]              FUNC   31            ; =fn:write
+198    [ 09 03]                       CALL   3                    
+200    [ 05 1e 00 00 00]              CONST  30            ; ="\n"
+205    [ 68 01]                       LOCAL  1                    
+207    [ 66 1d 00 00 00]              FUNC   29            ; =fn:standard-out
+212    [ 09 00]                       CALL   0                    
+214    [ 66 1f 00 00 00]              FUNC   31            ; =fn:write
+219    [ 09 03]                       CALL   3                    
+221    [ 05 20 00 00 00]              CONST  32            ; =1.4
+226    [ 6a 05]                       LET    5                    
+228    [ 05 1e 00 00 00]              CONST  30            ; ="\n"
+233    [ 68 05]                       LOCAL  5                    
+235    [ 66 1d 00 00 00]              FUNC   29            ; =fn:standard-out
+240    [ 09 00]                       CALL   0                    
+242    [ 66 1f 00 00 00]              FUNC   31            ; =fn:write
+247    [ 09 03]                       CALL   3                    
+249    [ 05 21 00 00 00]              CONST  33            ; =-1.4
+254    [ 6a 05]                       LET    5                    
+256    [ 05 1e 00 00 00]              CONST  30            ; ="\n"
+261    [ 68 05]                       LOCAL  5                    
+263    [ 66 1d 00 00 00]              FUNC   29            ; =fn:standard-out
+268    [ 09 00]                       CALL   0                    
+270    [ 66 1f 00 00 00]              FUNC   31            ; =fn:write
+275    [ 09 03]                       CALL   3                    
+277    [ 68 05]                       LOCAL  5                    
+279    [ 1d 00]                       INT    0                    
+281    [ 2c]                          SUB    
+282    [ 6a 05]                       LET    5                    
+284    [ 05 1e 00 00 00]              CONST  30            ; ="\n"
+289    [ 68 05]                       LOCAL  5                    
+291    [ 66 1d 00 00 00]              FUNC   29            ; =fn:standard-out
+296    [ 09 00]                       CALL   0                    
+298    [ 66 1f 00 00 00]              FUNC   31            ; =fn:write
+303    [ 09 03]                       CALL   3                    
+305    [ 05 22 00 00 00]              CONST  34            ; ="howdy, howdy doody"
+310    [ 6a 06]                       LET    6                    
+312    [ 68 03]                       LOCAL  3                    
+314    [ 09 00]                       CALL   0                    
+316    [ 0e]                          END    
+

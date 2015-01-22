@@ -1,0 +1,35 @@
+(procedure
+
+  (let stdout (standard-out))
+
+  (function this-is-my-function (a b c)
+    (write (standard-out) "A: " a " B: " b " C: " c "\n"))
+
+  (write stdout "Math: " (+ 13 (+ (+ 12 (* 42 84)) (+ 91 (/ 100 5)))) "\n")
+
+  (let count 0)
+  (foreach (x '(a b c d e f g))
+    (let count (+ count 1.0))
+    (this-is-my-function count x count))
+
+  (write stdout count "\n")
+ 
+  (ask "did you get that?")
+  
+  (let stream (open-out-file "a-new-file.txt" "a"))
+  
+  (write stream "hey little file 2!!\n")
+  
+  (let string-stream (open-out-string))
+  (write string-stream "hola" " " "bobby" " " "boy!" "\n")
+  (write stdout string-stream)
+   
+  (write stdout "yo yo yo\n")
+  
+  (write stdout 'stream "\t" stream "\n"
+                'ask    "\t" ask    "\n"
+                'stdout "\t" stdout "\n")
+  
+  (close stream)
+  
+  (wait))

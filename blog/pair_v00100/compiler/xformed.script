@@ -1,0 +1,240 @@
+(procedure 
+
+ (function print-elems 
+  (a) 
+  ($scope 
+   ($let @0 0) 
+   (foreach 
+    (x a) 
+    (print "[" @0 "] = " x "\n") 
+    (set @0 
+     (+ @0 1)))))
+ 
+ ($scope 
+  ($let @1 
+   (array 23 343 54 23 54 2 1 1)) 
+  ($let @2 
+   (list 23 343 54 23 54 2 1 1)) 
+  (print-elems @1) 
+  (print-elems @2) 
+  (print "(nth a 2) = " 
+   (nth @1 2) "\n") 
+  (print "(nth b 2) = " 
+   (nth @2 2) "\n") 
+  (set-nth @1 2 5) 
+  (set-nth @2 2 5) 
+  (print-elems @1) 
+  (print-elems @2)) 
+ (procedure 
+  (define MB_OK 0) 
+  (define MB_OKCANCEL 1) 
+  (define MB_ABORTRETRYIGNORE 2) 
+  (define MB_YESNOCANCEL 3) 
+  (define MB_YESNO 4) 
+  (define MB_RETRYCANCEL 5) 
+  (define MB_CANCELTRYCONTINUE 6) 
+  (define MB_ICONHAND 16) 
+  (define MB_ICONQUESTION 32) 
+  (define MB_ICONEXCLAMATION 48) 
+  (define MB_ICONASTERISK 64) 
+  (define MB_USERICON 128) 
+  (define MB_ICONWARNING MB_ICONEXCLAMATION) 
+  (define MB_ICONERROR MB_ICONHAND) 
+  (define MB_ICONINFORMATION MB_ICONASTERISK) 
+  (define MB_ICONSTOP MB_ICONHAND) 
+  (define MB_APPLMODAL 0) 
+  (define MB_SYSTEMMODAL 4096) 
+  (define MB_TASKMODAL 8192) 
+  (define MB_HELP 16384) 
+  (define MB_NOFOCUS 32768) 
+  (define MB_SETFOREGROUND 65536) 
+  (define MB_DEFAULT_DESKTOP_ONLY 131072) 
+  (define MB_TOPMOST 262144) 
+  (define MB_RIGHT 524288) 
+  (define MB_RTLREADING 1048576) 
+  (define MB_SERVICE_NOTIFICATION 2097152) 
+  (define _wait 
+   (import "msvcrt.dll" 
+    'cdecl 
+    '_getch 
+    'u "")) 
+  (define system 
+   (import "msvcrt.dll" 
+    'cdecl 
+    'system 
+    'u "s")) 
+  (define _message-box 
+   (import "user32.dll" 
+    'stdcall 
+    'MessageBoxA 
+    'u "ussu")) 
+  (define message-beep 
+   (import "user32.dll" 
+    'stdcall 
+    'MessageBeep 
+    'u "u")) 
+  (define sleep 
+   (import "kernel32.dll" 
+    'stdcall 
+    'Sleep 
+    'v "u")) 
+  (define _fopen 
+   (import "msvcrt.dll" 
+    'cdecl 
+    'fopen 
+    'p "ss")) 
+  (define _fwrite 
+   (import "msvcrt.dll" 
+    'cdecl 
+    'fwrite 
+    'u "puup")) 
+  (define _fclose 
+   (import "msvcrt.dll" 
+    'cdecl 
+    'fclose 
+    'u "p")) 
+
+  (function ask 
+   (caption text) 
+   (_message-box 0 text caption 0))
+ 
+
+  (function print () 
+   ($scope 
+    ($let @3 
+     (append 
+      (list 
+       (standard-out)) 
+      (args))) 
+    (apply 
+     (fn write) @3)))
+ 
+
+  (function println () 
+   ($scope 
+    ($let @4 
+     (append 
+      (list 
+       (standard-out)) 
+      (args) 
+      '("\n"))) 
+    (apply 
+     (fn write) @4)))
+ 
+
+  (function wait () 
+   (println "") 
+   (println "Hit any key to continue..") 
+   (_wait))
+ 
+
+  (function first-member 
+   (x s) 
+   (while s 
+    (if 
+     (= 
+      (first s) x) 
+     (return s)) 
+    (set s 
+     (rest s))) ())
+ 
+
+  (function last-member 
+   (x s) 
+   ($scope 
+    ($let @5 s) 
+    ($let @6 ()) 
+    (while @5 
+     (if 
+      (= 
+       (first @5) x) 
+      (set @6 @5)) 
+     (set @5 
+      (rest @5))) @6))
+) 
+
+ (function this-is-my-function 
+  (a b c) 
+  (print "A: " a " B: " b " C: " c "\n"))
+ 
+ (print "Math: " 3664 "\n") 
+ ($scope 
+  ($let @7 0) 
+  (foreach 
+   (x 
+    '(a b c d e f g)) 
+   (set @7 
+    (+ @7 1)) 
+   (this-is-my-function @7 x @7)) 
+  (foreach 
+   (x "Hello, my pretties!!!!") 
+   (print "[" x "] ")) 
+  (print "\n") 
+  (print @7 "\n") 
+  (print "Asking - assoc?\n" " " 
+   '(assoc? (x . y)) " " 
+   (assoc? 
+    '(x . y)) "\n" " " 
+   '(assoc? (x y)) " " 
+   (assoc? 
+    '(x y)) "\n" " " 
+   '(assoc? count) " " 
+   (assoc? @7) "\n") 
+  (print "Asking - pair?\n" " " 
+   '(pair? (x . y)) " " 
+   (pair? 
+    '(x . y)) "\n" " " 
+   '(pair? (x y)) " " 
+   (pair? 
+    '(x y)) "\n" " " 
+   '(pair? count) " " 
+   (pair? @7) "\n") 
+  (print "Asking - atom?\n" " " 
+   '(atom? (x . y)) " " 
+   (atom? 
+    '(x . y)) "\n" " " 
+   '(atom? (x y)) " " 
+   (atom? 
+    '(x y)) "\n" " " 
+   '(atom? count) " " 
+   (atom? @7) "\n") 
+  (print "Asking - length\n" " " 
+   '(length (x y z a b c)) " " 
+   (length 
+    '(x y z a b c)) "\n" " " 
+   '(length (x y)) " " 
+   (length 
+    '(x y)) "\n" " " 
+   '(length count) " " 
+   (length @7) "\n")) 
+ (foreach 
+  (x 
+   '(1 2)) 
+  (foreach 
+   (y 
+    '(1 2)) 
+   (print x "  < " y "? " 
+    (< x y) "\n") 
+   (print x "  > " y "? " 
+    (> x y) "\n") 
+   (print x "  = " y "? " 
+    (= x y) "\n") 
+   (print x " <= " y "? " 
+    (<= x y) "\n") 
+   (print x " >= " y "? " 
+    (>= x y) "\n"))) 
+ ($scope 
+  ($let @8 
+   (open-out-file "a-new-file.txt" "a")) 
+  (write @8 "hey little file 2!!\n") 
+  (print 
+   'stream "\t" @8 "\n" 
+   'stdout "\t" 
+   (standard-out) "\n" 
+   'x "\t" x "\n") 
+  (close @8)) 
+ ($scope 
+  ($let @9 
+   (open-out-string)) 
+  (write @9 "hola" " " "bobby" " " "boy!" "\n") 
+  (print @9)))

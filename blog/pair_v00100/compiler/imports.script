@@ -1,0 +1,78 @@
+(procedure
+  
+  (define MB_OK                       0)
+  (define MB_OKCANCEL                 1)  
+  (define MB_ABORTRETRYIGNORE         2)
+  (define MB_YESNOCANCEL              3)
+  (define MB_YESNO                    4)
+  (define MB_RETRYCANCEL              5)
+  (define MB_CANCELTRYCONTINUE        6)
+
+  (define MB_ICONHAND                 16)
+  (define MB_ICONQUESTION             32)
+  (define MB_ICONEXCLAMATION          48)
+  (define MB_ICONASTERISK             64)
+
+  (define MB_USERICON                 128)
+  (define MB_ICONWARNING              MB_ICONEXCLAMATION)
+  (define MB_ICONERROR                MB_ICONHAND)
+
+  (define MB_ICONINFORMATION          MB_ICONASTERISK)
+  (define MB_ICONSTOP                 MB_ICONHAND)
+
+  (define MB_APPLMODAL                0)
+  
+  (define MB_SYSTEMMODAL              0x00001000)
+  (define MB_TASKMODAL                0x00002000)
+  (define MB_HELP                     0x00004000)
+
+  (define MB_NOFOCUS                  0x00008000)
+  (define MB_SETFOREGROUND            0x00010000)
+  (define MB_DEFAULT_DESKTOP_ONLY     0x00020000)
+
+  (define MB_TOPMOST                  0x00040000)
+  (define MB_RIGHT                    0x00080000)
+  (define MB_RTLREADING               0x00100000)
+
+  (define MB_SERVICE_NOTIFICATION     0x00200000)  
+  
+  (define _wait         (import "msvcrt.dll"   'cdecl   '_getch      'u ""))
+  (define system        (import "msvcrt.dll"   'cdecl   'system      'u "s"))
+  (define _message-box  (import "user32.dll"   'stdcall 'MessageBoxA 'u "ussu"))
+  (define message-beep  (import "user32.dll"   'stdcall 'MessageBeep 'u "u"))
+  (define sleep         (import "kernel32.dll" 'stdcall 'Sleep       'v "u"))
+  
+  (define _fopen        (import "msvcrt.dll"   'cdecl   'fopen       'p "ss"))
+  (define _fwrite       (import "msvcrt.dll"   'cdecl   'fwrite      'u "puup"))
+  (define _fclose       (import "msvcrt.dll"   'cdecl   'fclose      'u "p"))  
+
+  (function ask (caption text)
+    (_message-box 0 text caption 0))
+
+  (function print ()
+    (let ((arguments (append (list (standard-out)) (args))))
+      (apply (fn write) arguments)))
+    
+  (function println ()
+    (let ((arguments (append (list (standard-out)) (args) '("\n"))))
+      (apply (fn write) arguments)))
+
+  (function wait ()
+    (println "")
+    (println "Hit any key to continue..")
+    (_wait))
+
+  (function first-member (x s)
+    (while s
+      (if (= (first s) x)
+        (return s))
+      (set s (rest s)))
+    nil)
+    
+  (function last-member (x s)
+    (let ((u s) (v ()))
+      (while u
+        (if (= (first u) x)
+          (set v u))
+        (set u (rest u)))
+        v))))

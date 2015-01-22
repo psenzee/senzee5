@@ -1,0 +1,64 @@
+(procedure
+
+  (function print ()
+    (let arguments (append (list (standard-out)) (args)))
+    (apply (fn write) arguments))
+ 
+  (function this-is-my-function (a b c)
+    (print "A: " a " B: " b " C: " c "\n"))
+
+  (print "Math: " (+ 13 (+ (+ 12 (* 42 84)) (+ 91 (/ 100 5)))) "\n")
+
+  (let count 0)
+  (foreach (x '(a b c d e f g))
+    (let count (+ count 1.0))
+    (this-is-my-function count x count))
+    
+  (foreach (x "Hello, my pretties!!!!")
+    (print "[" x "] "))
+  (print "\n")
+
+  (print count "\n")
+  
+  (print "Asking - assoc?\n"
+         " " '(assoc? (x . y)) " " (assoc? '(x . y)) "\n"
+         " " '(assoc? (x y)) " " (assoc? '(x y)) "\n"
+         " " '(assoc? count) " " (assoc? count) "\n")
+           
+  (print "Asking - pair?\n"
+         " " '(pair? (x . y)) " " (pair? '(x . y)) "\n"
+         " " '(pair? (x y)) " " (pair? '(x y)) "\n"          
+         " " '(pair? count) " " (pair? count) "\n")
+
+  (print "Asking - atom?\n"
+         " " '(atom? (x . y)) " " (atom? '(x . y)) "\n"
+         " " '(atom? (x y)) " " (atom? '(x y)) "\n"          
+         " " '(atom? count) " " (atom? count) "\n")
+           
+  (print "Asking - length\n"
+         " " '(length (x y z a b c)) " " (length '(x y z a b c)) "\n"
+         " " '(length (x y)) " " (length '(x y)) "\n"
+         " " '(length count) " " (length count) "\n")
+           
+ 
+  (ask "did you get that?")
+  
+  (let x (fn ask))  
+  (let y '("This is a Question" "Answer It!"))
+  (print "User answers '" (apply x y) "'\n")
+  
+  (let   stream (open-out-file "a-new-file.txt" "a"))
+  (write stream "hey little file 2!!\n")
+  
+  (let   string-stream (open-out-string))
+  (write string-stream "hola" " " "bobby" " " "boy!" "\n")
+  (print string-stream)
+  
+  (print 'stream "\t" stream         "\n"
+         'ask    "\t" (fn ask)       "\n"
+         'stdout "\t" (standard-out) "\n"
+         'x      "\t" x              "\n")
+  
+  (close stream)
+  
+  (wait))

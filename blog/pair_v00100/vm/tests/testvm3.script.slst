@@ -1,0 +1,26 @@
+; file 'testvm3.script.slst'
+; total code size 44
+
+; bytecode
+
+; constants --
+; 01 00 00 00 02 00 00 80 3f
+
+; constants (data) -- 
+; 0      [PrimitiveT<float>]           '1'
+
+; code
+
+; function 'MAIN' id=-1 localsize=64 stacksize=10
+; 1d 00 6a 00 05 00 00 00 00 68 00 2b 6a 00 0e
+
+
+;  function 'MAIN' id=-1 localsize=64 stacksize=10
+0      [ 1d 00]                       INT    0                    
+2      [ 6a 00]                       LET    0                    
+4      [ 05 00 00 00 00]              CONST  0             ; =1
+9      [ 68 00]                       LOCAL  0                    
+11     [ 2b]                          ADD    
+12     [ 6a 00]                       LET    0                    
+14     [ 0e]                          END    
+

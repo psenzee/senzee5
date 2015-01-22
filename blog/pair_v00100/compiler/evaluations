@@ -1,0 +1,68 @@
+(evaluations
+
+    (include    #include-evaluator)
+
+    (+          #left-to-right-nest-evaluator)
+    (+          #add-evaluator)
+    (-          #left-to-right-nest-evaluator)
+    (-          #subtract-evaluator)
+    (*          #left-to-right-nest-evaluator)
+    (*          #multiply-evaluator)
+    (/          #left-to-right-nest-evaluator)
+    (/          #divide-evaluator)
+
+    (%          #left-to-right-nest-evaluator)
+    (%          #modulus-evaluator)
+
+    (|          #left-to-right-nest-evaluator)
+    (|          #bit-or-evaluator)
+    (&          #left-to-right-nest-evaluator)
+    (&          #bit-and-evaluator)
+    (^          #left-to-right-nest-evaluator)
+    (^          #bit-xor-evaluator)
+
+    (>>         #bit-shift-right-evaluator)
+    (<<         #bit-shift-left-evaluator)
+
+    (let        #let-evaluator)
+
+    (procedure  #procedure-evaluator)
+    ($scope     #procedure-evaluator)
+
+    (set        #unify           (set (nth ?x ?y) ?z)            (set-nth ?x ?y ?z))
+    (set        #unify           (set (first ?x) ?y)             (set-first ?x ?y))
+    (set        #unify           (set (rest ?x) ?y)              (set-rest ?x ?y))
+
+    (and        #left-to-right-nest-evaluator)
+    (or         #left-to-right-nest-evaluator)
+
+    (and        #unify           (and ?x ?y)                     (if ?x ?y nil))
+    (or         #unify           (or ?x-atom ?y)                 (if ?x-atom ?x-atom ?y))
+    (or         #unify           (or ?x ?y)                      (if ?x true ?y)) ; quick fix could use (if ?x true ?y) (but now [and] and [or] are not symmetric but..
+                                                               ; (if ($let @tmp1 ?x) @tmp1 ?y) ; eventually to something like this
+
+    (true?      #unify           (true? ?x)                      (not-nil? ?x))
+    (nil?       #unify           (nil? ?x)                       (not ?x))
+    (not        #unify           (not (not ?x))                  (not-nil? ?x))
+    (not-nil?   #unify           (not-nil? (not ?x))             (not ?x))
+
+    (if         #unify           (if (not ?x) ?y ?z)             (if ?x ?z ?y))
+    (if         #unify           (if (not-nil? ?x) ?y ?z)        (if ?x ?y ?z))
+
+    (if         #unify           (if ?-true ?y ?-nil)            ?y)
+    (if         #unify           (if ?-nil ?-nil ?x)             ?x)
+    (if         #unify           (if ?x ?-nil ?-true)            (not ?x))
+    (if         #unify           (if ?x ?-true ?-nil)            (not-nil? ?x))
+    (if         #unify           (if ?x ?y-no-fx ?z-no-fx)       ($cond ?x ?y-no-fx ?z-no-fx))
+
+    ($cond      #unify           ($cond (not ?x) ?y ?z)          ($cond ?x ?z ?y))
+    ($cond      #unify           ($cond (not-nil? ?x) ?y ?z)     ($cond ?x ?y ?z))
+
+    ($cond      #unify           ($cond ?-literal ?x ?y)         ?x)
+    ($cond      #unify           ($cond ?-true ?x ?-nil)         ?x)
+    ($cond      #unify           ($cond ?-nil ?-nil ?x)          ?x)
+    ($cond      #unify           ($cond ?x-atom ?x-atom ?-nil)   ?x-atom)
+  ; ($cond      #unify           ($cond ?x-atom ?-nil ?x-atom)   nil) ; nil doesn't work as a return value need a stand-in or slightly different architecture..
+    ($cond      #unify           ($cond ?x-atom ?x-atom ?x-atom) ?x-atom)
+    
+    )

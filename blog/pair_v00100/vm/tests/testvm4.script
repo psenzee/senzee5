@@ -1,0 +1,39 @@
+(procedure
+
+  (let sleep  (import "kernel32.dll" 'stdcall 'Sleep  'v 'u))
+  (let beep   (import "kernel32.dll" 'stdcall 'Beep   'u 'uu))
+  (let system (import "msvcrt.dll"   'cdecl   'system 'u 's))
+  (let wait   (import "msvcrt.dll"   'cdecl   '_getch 'u ""))
+    
+  (system "dir c:\\root")
+  
+  (foreach (x '(a b c d e f g))
+;   (beep  500 1000)
+    (sleep 500))
+
+  (write (standard-out) sleep "\n")
+  (write (standard-out) beep  "\n")  
+
+  (let x 1.4)
+  (write (standard-out) x       "\n")
+  (let x -1.4)
+  (write (standard-out) x       "\n")  
+  
+  (let x (- 0 x))
+  
+  (write (standard-out) x       "\n")  
+
+;  (write (standard-out) (random) "\n")
+  
+;  (write (standard-out) (abs x)  "\n")
+;  (write (standard-out) (sin x)  "\n")
+;  (write (standard-out) (cos x)  "\n")
+;  (write (standard-out) (tan x)  "\n")
+;  (write (standard-out) (sqrt x) "\n")
+;  (write (standard-out) (system "dir") "\n")  
+  
+  (let message "howdy, howdy doody")
+  
+;  (write (standard-out) (strlen message) "\n")
+  
+  (wait))
